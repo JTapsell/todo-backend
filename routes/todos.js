@@ -1,18 +1,23 @@
 const express = require('express');
-const { check } = require('express-validator')
+const { check } = require('express-validator');
+
 const router = express.Router();
 
 const todosControllers = require('../controllers/todos-controllers');
+const checkAuth = require('../middleware/check-auth');
 
-router.get('/:uid', todosControllers.getTodosById) 
+router.get('/', todosControllers.getAllTodos);
 
-router.post('/', [
-    check('description').not().isEmpty(),
-    check('checked').not().isEmpty(),
-    check('uid').not().isEmpty()
-],
- todosControllers.addTodos)
+router.get('/:uid', todosControllers.getTodosByUid);
 
-router.patch('/:uid', todosControllers.updateTodos)
+router.get('/todo/:id', todosControllers.getTodosById);
+
+router.use(checkAuth);
+
+router.post(
+  '/',
+  [check('description').not().isEmpty(), check('checked').not().isEmpty()],
+  todosControllers.addTodos
+);
 
 module.exports = router;
