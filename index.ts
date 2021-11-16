@@ -1,5 +1,7 @@
 const express = require('express');
 
+require('dotenv').config();
+
 const mongoose = require('mongoose');
 
 const todoRoutes = require('./src/routes/todos');
@@ -37,7 +39,8 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://john:GoUQFfFE8iLBifrM@cluster0.1il8s.mongodb.net/new_todos?retryWrites=true&w=majority`
+
+    `${process.env.MONGO_CLIENT}`
   )
   .then(() => app.listen(8080))
   .catch(err => console.log(err));
