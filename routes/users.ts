@@ -1,12 +1,11 @@
-const express = require('express');
+import express from 'express';
 
 const router = express.Router();
-const { body, check } = require('express-validator');
-const HttpError = require('../models/http-error');
+import { body, check } from 'express-validator';
+import { HttpError } from '../models/http-error';
 
-const usersControllers = require('../controllers/users-controllers');
-
-router.get('/', usersControllers.getUsers);
+import { signUp, login, getUsers } from '../controllers/users-controllers';
+router.get('/', getUsers);
 
 router.post(
   '/sign-up',
@@ -17,14 +16,14 @@ router.post(
     check('password').isLength({ min: 6 }),
     body('confirmPassword').custom((value, { req }) => {
       if (value !== req.body.password) {
-        throw new HttpError("Passwords don't match", 422);
+        throw new HttpError("Passwords don't match");
       }
       return true;
     }),
   ],
-  usersControllers.signUp
+  signUp
 );
 
-router.post('/login', usersControllers.login);
+router.post('/login', login);
 
 module.exports = router;

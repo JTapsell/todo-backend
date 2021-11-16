@@ -1,26 +1,27 @@
-const { validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const HttpError = require('../models/http-error');
+import { Request, Response } from 'express';
+import { validationResult } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { HttpError } from '../models/http-error';
+import { User } from '../models/user';
 
-const User = require('../models/user');
-
-const getUsers = async (req, res, next) => {
+export const getUsers = async (req: Request, res: Response, next) => {
   let users;
 
   try {
     users = await User.find({}, '-password');
   } catch (err) {
-    const error = new HttpError('Error occurred getting users, please try again', 500);
+    const error = new HttpError('Error occurred getting users, please try again');
     return next(error);
   }
 
   res.status(200).json({ users: users.map(user => user.toObject({ getters: true })) });
 };
-const signUp = async (req, res, next) => {
+
+export const signUp = async (req: Request, res: Response, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new HttpError('Invalid inputs, please check your data', 422);
+    const error = new HttpError('Invalid inputs, please check your data');
     return next(error);
   }
 
@@ -31,7 +32,7 @@ const signUp = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email });
   } catch (err) {
-    const error = new HttpError('Signup failed, please try again later', 500);
+    const error = new HttpError('Signup failed, please try again later');
     return next(error);
   }
 
@@ -44,7 +45,7 @@ const signUp = async (req, res, next) => {
   try {
     hashedPassword = await bcrypt.hash(password, 12);
   } catch (err) {
-    const error = new HttpError('Could not create User', 500);
+    const error = new HttpError('Could not create User');
     next(error);
   }
 
@@ -59,37 +60,38 @@ const signUp = async (req, res, next) => {
   try {
     await createdUser.save();
   } catch (err) {
-    const error = new HttpError('Sign up failed', 500);
+    const error = new HttpError('Sign up failed');
     return next(error);
   }
 
   let token;
 
   try {
-    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, process.env.JWT_KEY, {
+    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'placeholder_key', {
       expiresIn: '12h',
     });
   } catch (err) {
-    const error = new HttpError('Sign up failed', 500);
+    console.log(err);
+    const error = new HttpError('Sign up failed');
     return next(error);
   }
 
   res.status(201).json({ userId: createdUser.id, email: createdUser.email, token });
 };
 
-const login = async (req, res, next) => {
+export const login = async (req: Request, res: Response, next) => {
   const { email, password } = req.body;
   let user;
 
   try {
     user = await User.findOne({ email });
   } catch (err) {
-    const error = new HttpError('login failed', 500);
+    const error = new HttpError('login failed');
     next(error);
   }
 
   if (!user) {
-    const error = new HttpError('Could not login, please check credentials', 401);
+    const error = new HttpError('Could not login, please check credentials');
     return next(error);
   }
 
@@ -97,31 +99,27 @@ const login = async (req, res, next) => {
   try {
     isValidPassword = await bcrypt.compare(password, user.password);
   } catch (err) {
-    const error = new HttpError('Could not login, please check credentials', 500);
+    const error = new HttpError('Could not login, please check credentials');
     next(error);
   }
 
   if (!isValidPassword) {
-    const error = new HttpError('Could not login, please check credentials', 401);
+    const error = new HttpError('Could not login, please check credentials');
     return next(error);
   }
 
   let token;
 
   try {
-    token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_KEY, {
+    token = jwt.sign({ userId: user.id, email: user.email }, 'placeholder_key', {
       expiresIn: '12h',
     });
+    console.log(token)
   } catch (err) {
-    const error = new HttpError('Logging in failed', 500);
+    console.log(err)
+    const error = new HttpError('Logging in failed');
     return next(error);
   }
 
   res.status(201).json({ userId: user.id, email: user.email, token });
-};
-
-module.exports = {
-  getUsers,
-  signUp,
-  login,
 };

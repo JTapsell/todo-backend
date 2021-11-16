@@ -37,7 +37,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.1il8s.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+    `mongodb+srv://john:GoUQFfFE8iLBifrM@cluster0.1il8s.mongodb.net/new_todos?retryWrites=true&w=majority`
   )
   .then(() => app.listen(8080))
   .catch(err => console.log(err));
