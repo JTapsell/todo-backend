@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { HttpError } from '../models/http-error';
 import { User } from '../models/user';
 
-export const getUsers = async (req: Request, res: Response, next) => {
+export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   let users;
 
   try {
@@ -18,7 +18,7 @@ export const getUsers = async (req: Request, res: Response, next) => {
   res.status(200).json({ users: users.map(user => user.toObject({ getters: true })) });
 };
 
-export const signUp = async (req: Request, res: Response, next) => {
+export const signUp = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError('Invalid inputs, please check your data');
@@ -67,7 +67,7 @@ export const signUp = async (req: Request, res: Response, next) => {
   let token;
 
   try {
-    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'placeholder_key', {
+    token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, process.env.JWT_KEY, {
       expiresIn: '12h',
     });
   } catch (err) {
@@ -79,7 +79,7 @@ export const signUp = async (req: Request, res: Response, next) => {
   res.status(201).json({ userId: createdUser.id, email: createdUser.email, token });
 };
 
-export const login = async (req: Request, res: Response, next) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   let user;
 
@@ -111,7 +111,7 @@ export const login = async (req: Request, res: Response, next) => {
   let token;
 
   try {
-    token = jwt.sign({ userId: user.id, email: user.email }, 'placeholder_key', {
+    token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_KEY, {
       expiresIn: '12h',
     });
     console.log(token)

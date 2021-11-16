@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { HttpError } from '../models/http-error';
 
-export const checkAuth = (req: Request, res: Response, next): void => {
+export const checkAuth = (req: Request, res: Response, next: NextFunction): void => {
   if (req.method === 'OPTIONS') {
     return next();
   }
@@ -14,7 +14,7 @@ export const checkAuth = (req: Request, res: Response, next): void => {
     }
     console.log(token);
   
-    const decodedToken = jwt.verify(token, 'placeholder_key');
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
     req.body = { userId: decodedToken.userId };
     next();
   } catch (err) {

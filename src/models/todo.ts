@@ -1,10 +1,5 @@
 import { Schema, Types, model, Document } from 'mongoose';
-
-interface ITodo {
-  uid: Types.ObjectId;
-  description: string;
-  checked: boolean
-}
+import { ITodo } from '../interfaces/todoInterface';
 
 const todoSchema = new Schema({
   uid: { type: Types.ObjectId, required: true, ref: 'User' },

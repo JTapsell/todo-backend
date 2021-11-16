@@ -1,13 +1,13 @@
 import express from 'express';
 
-const router = express.Router();
+const userRouter = express.Router();
 import { body, check } from 'express-validator';
 import { HttpError } from '../models/http-error';
 
 import { signUp, login, getUsers } from '../controllers/users-controllers';
-router.get('/', getUsers);
+userRouter.get('/', getUsers);
 
-router.post(
+userRouter.post(
   '/sign-up',
   [
     check('firstName').not().isEmpty(),
@@ -24,6 +24,6 @@ router.post(
   signUp
 );
 
-router.post('/login', login);
+userRouter.post('/login', login);
 
-module.exports = router;
+export { userRouter };

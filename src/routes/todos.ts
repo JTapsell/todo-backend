@@ -1,7 +1,7 @@
 import express from 'express';
 import { check } from 'express-validator';
 
-const router = express.Router();
+const todoRouter = express.Router();
 
 import {
   getAllTodos,
@@ -13,22 +13,22 @@ import {
 } from '../controllers/todos-controllers';
 import { checkAuth } from'../middleware/check-auth';
 
-router.get('/', getAllTodos);
+todoRouter.get('/', getAllTodos);
 
-router.patch('/', updateTodo);
+todoRouter.patch('/', updateTodo);
 
-router.delete('/', deleteTodo);
+todoRouter.delete('/', deleteTodo);
 
-router.get('/:uid', getTodosByUid);
+todoRouter.get('/:uid', getTodosByUid);
 
-router.get('/todo/:id', getTodosById);
+todoRouter.get('/todo/:id', getTodosById);
 
-router.use(checkAuth);
+todoRouter.use(checkAuth);
 
-router.post(
+todoRouter.post(
   '/',
   [check('description').not().isEmpty(), check('checked').not().isEmpty()],
   addTodos
 );
 
-module.exports = router;
+export { todoRouter }

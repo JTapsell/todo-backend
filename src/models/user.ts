@@ -1,13 +1,6 @@
 import { Schema, Types, model, Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-
-export interface IUser {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    todos: Types.ObjectId[];
-}
+import { IUser } from '../interfaces/userInterface';
 
 const userSchema = new Schema({
   firstName: { type: String, required: true },

@@ -1,11 +1,10 @@
-const express = require('express');
+import express, { NextFunction, Request, Response } from 'express';
+import mongoose from 'mongoose';
 
 require('dotenv').config();
 
-const mongoose = require('mongoose');
-
-const todoRoutes = require('./src/routes/todos');
-const userRoutes = require('./src/routes/users');
+import { todoRouter } from './src/routes/todos';
+import { userRouter } from './src/routes/users';
 
 const app = express();
 
@@ -16,7 +15,7 @@ app.use(
 );
 app.use(express.json());
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
@@ -26,11 +25,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/todos/', todoRoutes);
-app.use('/api/users/', userRoutes);
+app.use('/api/todos/', todoRouter);
+app.use('/api/users/', userRouter);
 
-app.use((error, req, res, next) => {
-  if (res.headerSent) {
+app.use((error, req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) {
     return next(error);
   }
   res.status(error.code || 500);
@@ -38,9 +37,6 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(
-
-    `${process.env.MONGO_CLIENT}`
-  )
+  .connect(`${process.env.MONGO_CLIENT}`)
   .then(() => app.listen(8080))
   .catch(err => console.log(err));

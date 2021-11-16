@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { HttpError } from '../models/http-error';
 import { Todo } from '../models/todo';
 import { User } from '../models/user';
 
-export const getAllTodos = async (req: Request, res: Response, next) => {
+export const getAllTodos = async (req: Request, res: Response, next: NextFunction) => {
   let todos;
   try {
     todos = await Todo.find({});
@@ -15,7 +15,7 @@ export const getAllTodos = async (req: Request, res: Response, next) => {
   }
   res.json({ todos: todos.map(todo => todo.toObject({ getters: true })) });
 };
-export const getTodosByUid = async (req: Request, res: Response, next) => {
+export const getTodosByUid = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.uid;
   let userWithTodos;
 
@@ -34,7 +34,7 @@ export const getTodosByUid = async (req: Request, res: Response, next) => {
   res.json({ todos: userWithTodos.todos.map(todo => todo.toObject({ getters: true })) });
 };
 
-export const getTodosById = async (req: Request, res: Response, next) => {
+export const getTodosById = async (req: Request, res: Response, next: NextFunction) => {
   const todoId = req.params.id;
   let todo;
 
@@ -53,7 +53,7 @@ export const getTodosById = async (req: Request, res: Response, next) => {
   res.json({ todo: todo.toObject({ getters: true }) });
 };
 
-export const addTodos = async (req: Request, res: Response, next) => {
+export const addTodos = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError('Invalid inputs, please check your data');
@@ -95,10 +95,10 @@ export const addTodos = async (req: Request, res: Response, next) => {
   res.status(201).json({ todo: createdTodo });
 };
 
-export const updateTodo = async (req: Request, res: Response, next) => {
+export const updateTodo = async (req: Request, res: Response, next: NextFunction) => {
   const updatedTodo = req.body.updatedTodo;
 };
 
-export const deleteTodo = async (req: Request, res: Response, next) => {
+export const deleteTodo = async (req: Request, res: Response, next: NextFunction) => {
   const deletedTodo = req.body.deletedTodo;
 };
