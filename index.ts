@@ -2,8 +2,8 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
-const todoRoutes = require('./routes/todos');
-const userRoutes = require('./routes/users');
+const todoRoutes = require('./src/routes/todos');
+const userRoutes = require('./src/routes/users');
 
 const app = express();
 
