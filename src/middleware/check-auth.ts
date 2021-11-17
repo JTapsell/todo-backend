@@ -11,9 +11,7 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction): void
 
     if (!token) {
       throw new Error('authorization failed');
-    }
-    console.log(token);
-  
+    }  
     const decodedToken = jwt.verify(token, process.env.JWT_KEY);
     req.body = { userId: decodedToken.userId };
     next();

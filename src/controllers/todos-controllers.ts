@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import mongoose from 'mongoose';
+import { startSession } from 'mongoose';
 import { HttpError } from '../models/http-error';
 import { Todo } from '../models/todo';
 import { User } from '../models/user';
@@ -10,7 +10,7 @@ export const getAllTodos = async (req: Request, res: Response, next: NextFunctio
   try {
     todos = await Todo.find({});
   } catch (err) {
-      const error = new HttpError('Getting Todos failed');
+    const error = new HttpError('Getting Todos failed');
     return next(error);
   }
   res.json({ todos: todos.map(todo => todo.toObject({ getters: true })) });
@@ -53,7 +53,7 @@ export const getTodosById = async (req: Request, res: Response, next: NextFuncti
   res.json({ todo: todo.toObject({ getters: true }) });
 };
 
-export const addTodos = async (req: Request, res: Response, next: NextFunction) => {
+export const addTodos = async (req, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError('Invalid inputs, please check your data');
@@ -70,7 +70,7 @@ export const addTodos = async (req: Request, res: Response, next: NextFunction) 
   let user;
 
   try {
-    user = await User.find(req.body.userId);
+    user = await User.findById(req.body.userId);
   } catch (err) {
     const error = new HttpError('Adding todo failed 1');
     return next(error);
@@ -81,7 +81,7 @@ export const addTodos = async (req: Request, res: Response, next: NextFunction) 
     return next(error);
   }
   try {
-    const session = await mongoose.startSession();
+    const session = await startSession();
     await session.startTransaction();
     await createdTodo.save({ session });
     user.todos.push(createdTodo);
@@ -96,9 +96,32 @@ export const addTodos = async (req: Request, res: Response, next: NextFunction) 
 };
 
 export const updateTodo = async (req: Request, res: Response, next: NextFunction) => {
-  const updatedTodo = req.body.updatedTodo;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new HttpError('Invalid inputs, please check your data');
+    return next(error);
+  }
+
+  const { updatedTodo } = req.body;
+  const todoId = req.params.id;
+
+  try {
+    await Todo.findByIdAndUpdate(todoId, updatedTodo);
+  } catch (err) {
+    const error = new HttpError('Updating Todo failed');
+    return next(error);
+  }
+
+  res.status(201).json({ todo: updatedTodo });
 };
 
 export const deleteTodo = async (req: Request, res: Response, next: NextFunction) => {
-  const deletedTodo = req.body.deletedTodo;
+  const todoId = req.params.id;
+
+  try {
+    await Todo.findByIdAndDelete(todoId);
+  } catch (err) {
+    const error = new HttpError('Deleting Todo failed');
+    return next(error);
+  }
 };
