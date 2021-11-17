@@ -114,7 +114,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_KEY, {
       expiresIn: '12h',
     });
-    console.log(token)
   } catch (err) {
     console.log(err)
     const error = new HttpError('Logging in failed');
