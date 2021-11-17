@@ -53,16 +53,16 @@ export const getTodosById = async (req: Request, res: Response, next: NextFuncti
   res.json({ todo: todo.toObject({ getters: true }) });
 };
 
-export const addTodos = async (req, res: Response, next: NextFunction) => {
+export const addTodos = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError('Invalid inputs, please check your data');
     return next(error);
   }
 
-  const { description, checked } = req.body;
+  const { description, checked, uid } = req.body;
   const createdTodo = new Todo({
-    uid: req.body.userId,
+    uid,
     description,
     checked,
   });
@@ -70,7 +70,7 @@ export const addTodos = async (req, res: Response, next: NextFunction) => {
   let user;
 
   try {
-    user = await User.findById(req.body.userId);
+    user = await User.findById(uid);
   } catch (err) {
     const error = new HttpError('Adding todo failed 1');
     return next(error);
@@ -124,4 +124,6 @@ export const deleteTodo = async (req: Request, res: Response, next: NextFunction
     const error = new HttpError('Deleting Todo failed');
     return next(error);
   }
+
+  res.status(200).json({ response: 'todo deleted successfuly' });
 };

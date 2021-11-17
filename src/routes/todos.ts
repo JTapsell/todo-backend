@@ -11,7 +11,7 @@ import {
   getTodosById,
   addTodos,
 } from '../controllers/todos-controllers';
-import { checkAuth } from'../middleware/check-auth';
+import { checkAuth } from '../middleware/check-auth';
 
 todoRouter.get('/', getAllTodos);
 
@@ -19,9 +19,9 @@ todoRouter.get('/:uid', getTodosByUid);
 
 todoRouter.get('/todo/:id', getTodosById);
 
-todoRouter.delete('/todo/:id', deleteTodo);
-
 todoRouter.use(checkAuth);
+
+todoRouter.delete('/todo/:id', deleteTodo);
 
 todoRouter.post(
   '/',
@@ -29,7 +29,10 @@ todoRouter.post(
   addTodos
 );
 
-todoRouter.patch('/todo/:id',  [check('description').not().isEmpty(), check('checked').not().isEmpty()], updateTodo);
+todoRouter.patch(
+  '/todo/:id',
+  [check('description').not().isEmpty(), check('checked').not().isEmpty()],
+  updateTodo
+);
 
-
-export { todoRouter }
+export { todoRouter };
